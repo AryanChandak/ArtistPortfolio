@@ -13,57 +13,104 @@ import NewsletterSection from "@/components/newsletter-section"
 import Navigation from "@/components/navigation"
 import { ThemeProvider } from "@/components/theme-provider"
 
+// Smooth scroll-reveal wrapper
+function ScrollReveal({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 60 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{
+        duration: 1,
+        delay,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+    >
+      {children}
+    </motion.div>
+  )
+}
+
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 2000)
-
+    // Quick elegant loader
+    const timer = setTimeout(() => setIsLoading(false), 2000)
     return () => clearTimeout(timer)
   }, [])
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-      <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white overflow-x-hidden">
-        <AnimatePresence>
+    <div className="min-h-screen bg-background text-foreground">
+
+        <AnimatePresence mode="wait">
           {isLoading && (
             <motion.div
-              initial={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.8 }}
-              className="fixed inset-0 z-50 bg-black flex items-center justify-center"
+              key="loader"
+              exit={{ opacity: 0, y: -20, filter: "blur(10px)" }}
+              transition={{ duration: 0.8, ease: "easeInOut" }}
+              className="fixed inset-0 z-50 bg-background flex flex-col items-center justify-center overflow-hidden"
             >
+              <div className="text-center overflow-hidden mb-6">
+                <motion.h1
+                  initial={{ y: "100%", opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+                  className="font-[var(--font-playfair)] text-6xl md:text-8xl font-light text-foreground leading-tight"
+                >
+                  The <span className="text-primary italic pr-4">Visual</span>
+                </motion.h1>
+              </div>
               <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.8 }}
-                className="text-center"
-              >
-                <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">The Visual</h1>
-                <div className="w-32 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto animate-pulse" />
-              </motion.div>
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ duration: 1.5, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                className="w-full max-w-[300px] h-[1px] bg-primary/40 mx-auto"
+              />
             </motion.div>
           )}
         </AnimatePresence>
 
         {!isLoading && (
-          <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6 }}
+          >
             <Navigation />
             <main>
               <HeroSection />
-              <AboutSection />
-              <PortfolioSection />
-              <GlobalMapSection />
-              <VisualJournalSection />
-              <ContactSection />
-              <ShopSection />
-              <NewsletterSection />
+
+              <ScrollReveal>
+                <AboutSection />
+              </ScrollReveal>
+
+              <ScrollReveal>
+                <PortfolioSection />
+              </ScrollReveal>
+
+              <ScrollReveal>
+                <ShopSection />
+              </ScrollReveal>
+
+              <ScrollReveal>
+                <GlobalMapSection />
+              </ScrollReveal>
+
+              <ScrollReveal>
+                <VisualJournalSection />
+              </ScrollReveal>
+
+              <ScrollReveal>
+                <ContactSection />
+              </ScrollReveal>
+
+              <ScrollReveal>
+                <NewsletterSection />
+              </ScrollReveal>
             </main>
-          </>
+          </motion.div>
         )}
       </div>
-    </ThemeProvider>
   )
 }

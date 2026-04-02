@@ -1,148 +1,155 @@
-"use client"
+﻿"use client"
 
 import { useRef } from "react"
-import { motion, useInView, useScroll, useTransform } from "framer-motion"
+import { motion, useInView } from "framer-motion"
 
 const AboutSection = () => {
   const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: "-100px" })
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  })
-
-  const y = useTransform(scrollYProgress, [0, 1], [100, -100])
-  const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0])
+  const isInView = useInView(ref, { once: true, margin: "-50px" })
 
   return (
-    <section id="about" ref={ref} className="py-16 sm:py-20 lg:py-24 bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div style={{ y, opacity }} className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          <div className="order-2 lg:order-1">
-            <motion.h2
-              initial={{ opacity: 0, x: -50 }}
-              animate={isInView ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 0.8 }}
-              className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"
-            >
-              About The Vision
-            </motion.h2>
+    <section id="about" ref={ref} className="py-24 sm:py-32 lg:py-40 bg-card border-t border-foreground/[0.06]">
+      <div className="max-w-screen-2xl mx-auto px-6 sm:px-8 lg:px-16">
 
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={isInView ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="space-y-4 sm:space-y-6 text-base sm:text-lg text-gray-700 dark:text-gray-300"
-            >
-              <p>
-                I am a visual storyteller who believes that every image holds the power to transcend language, culture,
-                and time. My journey began with a simple camera and an insatiable curiosity about the world around me.
-              </p>
-
-              <p>
-                Over the years, I've evolved from capturing moments to crafting entire visual narratives that speak to
-                the soul. My work spans across digital art, photography, and immersive experiences that challenge
-                conventional boundaries.
-              </p>
-
-              <p>
-                Each piece in my portfolio represents a chapter in my ongoing exploration of human emotion, natural
-                beauty, and the intersection of technology with art. I believe in the power of visuals to create
-                connections and inspire change.
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="mt-6 sm:mt-8 grid grid-cols-3 gap-4 sm:gap-6"
-            >
-              <div className="text-center p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                <div className="text-2xl sm:text-3xl font-bold text-purple-600">500+</div>
-                <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Projects</div>
-              </div>
-              <div className="text-center p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                <div className="text-2xl sm:text-3xl font-bold text-pink-600">100+</div>
-                <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Connections</div>
-              </div>
-              <div className="text-center p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                <div className="text-2xl sm:text-3xl font-bold text-blue-600">20+</div>
-                <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Years</div>
-              </div>
-            </motion.div>
+        {/* Section header */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.7 }}
+          className="mb-14 sm:mb-20"
+        >
+          <div className="flex items-center gap-5 mb-8">
+            <div className="w-6 h-px bg-foreground/20" />
+            <p className="text-[8px] tracking-[0.55em] uppercase text-foreground/28 font-light">
+              Biography
+            </p>
           </div>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={isInView ? { opacity: 1, scale: 1 } : {}}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="relative order-1 lg:order-2"
-          >
-            <div className="relative overflow-hidden rounded-2xl">
-              <img
-                src="/placeholder.svg?height=600&width=500"
-                alt="The Visual Artist"
-                className="w-full h-64 sm:h-80 lg:h-96 object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-purple-900/50 to-transparent" />
-
-              {/* Overlay content */}
-              <div className="absolute bottom-4 left-4 right-4 text-white">
-                <h3 className="text-lg sm:text-xl font-bold mb-2">Creating Visual Stories</h3>
-                <p className="text-sm opacity-90">Every frame tells a story</p>
-              </div>
-            </div>
-
-            {/* Floating elements */}
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 20, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-              className="absolute -top-4 -right-4 w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full opacity-20"
-            />
-            <motion.div
-              animate={{ rotate: -360 }}
-              transition={{ duration: 15, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-              className="absolute -bottom-4 -left-4 w-8 h-8 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full opacity-30"
-            />
-
-            {/* Decorative grid */}
-            <div className="absolute inset-0 bg-gradient-to-br from-transparent via-purple-500/5 to-pink-500/5 rounded-2xl" />
-          </motion.div>
         </motion.div>
 
-        {/* Additional content to fill space */}
+        {/* Two column â€” text + portrait */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-28 items-start mb-24 sm:mb-32">
+
+          {/* Left â€” biography text */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.1 }}
+          >
+            <h2
+              className="text-5xl sm:text-6xl lg:text-7xl font-light text-foreground leading-[1.05] mb-10"
+              style={{ fontFamily: "var(--font-playfair), serif" }}
+            >
+              Puja<br />Dhanuka
+            </h2>
+
+            <div className="w-10 h-px bg-foreground/12 mb-10" />
+
+            <div className="space-y-5 text-foreground/50 font-light leading-[1.9] text-[15px]">
+              <p>
+                A visual storyteller who believes every image holds the power to transcend language, culture, and time.
+              </p>
+              <p>
+                Over the years, I have evolved from capturing moments to crafting entire visual narratives â€” work spanning digital art, photography, and immersive experiences that speak directly to the soul.
+              </p>
+              <p>
+                Each piece in my portfolio represents a chapter in an ongoing exploration of human emotion, natural beauty, and the intersection of technology with art.
+              </p>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-6 mt-14 pt-10 border-t border-foreground/[0.06]">
+              {[
+                { number: "500+", label: "Projects" },
+                { number: "100+", label: "Connections" },
+                { number: "20+", label: "Years" },
+              ].map((stat, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={isInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.5, delay: 0.35 + i * 0.08 }}
+                >
+                  <p
+                    className="text-3xl sm:text-4xl font-light text-foreground mb-1.5"
+                    style={{ fontFamily: "var(--font-playfair), serif" }}
+                  >
+                    {stat.number}
+                  </p>
+                  <p className="text-[8px] tracking-[0.35em] uppercase text-foreground/28">
+                    {stat.label}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Right â€” artist portrait */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={isInView ? { opacity: 1, scale: 1 } : {}}
+            transition={{ duration: 1, delay: 0.25 }}
+          >
+            <div className="relative overflow-hidden bg-muted aspect-[3/4]">
+              <img
+                src="/images/puja-dhanuka.jpg"
+                alt="Puja Dhanuka — Artist"
+                className="w-full h-full object-cover object-top hover:scale-[1.02] transition-transform duration-700"
+              />
+            </div>
+            <div className="flex justify-between items-center mt-4">
+              <p className="text-[8px] tracking-[0.35em] uppercase text-foreground/40">Puja Dhanuka</p>
+              <p className="text-[8px] tracking-[0.25em] uppercase text-foreground/30">Visual Artist</p>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Process â€” horizontal grid */}
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="mt-16 sm:mt-20 text-center"
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+          className="border-t border-foreground/[0.06] pt-16"
         >
-          <h3 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white">My Creative Process</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+          <p className="text-[8px] tracking-[0.55em] uppercase text-foreground/25 mb-10 font-light">
+            Creative Process
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-10">
             {[
-              { step: "01", title: "Inspiration", desc: "Finding the spark in everyday moments" },
-              { step: "02", title: "Conceptualization", desc: "Developing the visual narrative" },
-              { step: "03", title: "Creation", desc: "Bringing ideas to life through art" },
-              { step: "04", title: "Refinement", desc: "Perfecting every detail" },
-            ].map((item, index) => (
+              { n: "01", title: "Inspiration", desc: "Finding the spark in everyday moments" },
+              { n: "02", title: "Concept", desc: "Developing the visual narrative" },
+              { n: "03", title: "Creation", desc: "Bringing ideas to life through art" },
+              { n: "04", title: "Refinement", desc: "Perfecting every detail" },
+            ].map((item, i) => (
               <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
-                className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-shadow"
+                key={i}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.09 }}
+                className="border-t border-foreground/[0.06] pt-6"
               >
-                <div className="text-3xl font-bold text-purple-600 mb-3">{item.step}</div>
-                <h4 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">{item.title}</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{item.desc}</p>
+                <p className="text-[8px] tracking-[0.4em] uppercase text-foreground/20 mb-4 font-light">
+                  {item.n}
+                </p>
+                <p
+                  className="text-base font-light text-foreground/75 mb-2"
+                  style={{ fontFamily: "var(--font-playfair), serif" }}
+                >
+                  {item.title}
+                </p>
+                <p className="text-xs font-light text-foreground/35 leading-relaxed">
+                  {item.desc}
+                </p>
               </motion.div>
             ))}
           </div>
         </motion.div>
+
       </div>
     </section>
   )
 }
 
 export default AboutSection
+

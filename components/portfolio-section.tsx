@@ -1,13 +1,14 @@
-"use client"
+﻿"use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence, useInView } from "framer-motion"
-import { X, ExternalLink, Maximize2 } from "lucide-react"
+import { ArrowUpRight, ExternalLink } from "lucide-react"
+import ImageLightbox from "@/components/image-lightbox"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { createClient } from "@/utils/supabase/client"
 
 interface PortfolioItem {
-  id: number
+  id: string
   title: string
   category: string
   image: string
@@ -17,215 +18,194 @@ interface PortfolioItem {
   client?: string
 }
 
-const portfolioItems: PortfolioItem[] = [
-  {
-    id: 1,
-    title: "Digital Dreams",
-    category: "Digital Art",
-    image: "/placeholder.svg?height=400&width=600",
-    description: "An exploration of digital consciousness through abstract visual narratives.",
-    tags: ["Digital Art", "Abstract", "Conceptual"],
-    year: "2024",
-    client: "Personal Project",
-  },
-  {
-    id: 2,
-    title: "Urban Pulse",
-    category: "Photography",
-    image: "/placeholder.svg?height=400&width=600",
-    description: "Capturing the rhythm and energy of metropolitan life.",
-    tags: ["Photography", "Urban", "Street"],
-    year: "2023",
-    client: "City Magazine",
-  },
-  {
-    id: 3,
-    title: "Nature's Symphony",
-    category: "Photography",
-    image: "/placeholder.svg?height=400&width=600",
-    description: "A visual journey through untouched landscapes and natural wonders.",
-    tags: ["Photography", "Nature", "Landscape"],
-    year: "2024",
-    client: "National Geographic",
-  },
-  {
-    id: 4,
-    title: "Neon Futures",
-    category: "Digital Art",
-    image: "/placeholder.svg?height=400&width=600",
-    description: "Cyberpunk-inspired visions of tomorrow's world.",
-    tags: ["Digital Art", "Cyberpunk", "Futuristic"],
-    year: "2023",
-    client: "Tech Conference",
-  },
-  {
-    id: 5,
-    title: "Human Connections",
-    category: "Portrait",
-    image: "/placeholder.svg?height=400&width=600",
-    description: "Intimate portraits exploring human emotion and connection.",
-    tags: ["Portrait", "Emotion", "Human"],
-    year: "2024",
-    client: "Art Gallery",
-  },
-  {
-    id: 6,
-    title: "Abstract Realms",
-    category: "Digital Art",
-    image: "/placeholder.svg?height=400&width=600",
-    description: "Pushing the boundaries of digital expression and form.",
-    tags: ["Digital Art", "Abstract", "Experimental"],
-    year: "2023",
-    client: "Design Studio",
-  },
-]
-
-const categories = ["All", "Digital Art", "Photography", "Portrait"]
+const categories = ["All", "Digital Art", "Photography", "Portrait", "Prints", "Commission"]
 
 const PortfolioSection = () => {
+  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([])
   const [selectedCategory, setSelectedCategory] = useState("All")
   const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null)
   const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: "-100px" })
+  const isInView = useInView(ref, { once: true, margin: "-50px" })
+
+  useEffect(() => {
+    const fetchPortfolio = async () => {
+      const supabase = createClient()
+      const { data } = await supabase.from("portfolio_items").select("*").order("created_at", { ascending: false })
+      if (data) setPortfolioItems(data)
+    }
+    fetchPortfolio()
+  }, [])
 
   const filteredItems =
-    selectedCategory === "All" ? portfolioItems : portfolioItems.filter((item) => item.category === selectedCategory)
+    selectedCategory === "All"
+      ? portfolioItems
+      : portfolioItems.filter((item) => item.category === selectedCategory)
 
   return (
-    <section id="portfolio" ref={ref} className="py-16 sm:py-20 lg:py-24 bg-white dark:bg-black">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="portfolio" ref={ref} className="py-24 sm:py-32 lg:py-40 bg-background border-t border-foreground/[0.06]">
+      <div className="max-w-screen-2xl mx-auto px-6 sm:px-8 lg:px-16">
+
+        {/* Section header */}
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-12 sm:mb-16"
+          transition={{ duration: 0.7 }}
+          className="mb-14 sm:mb-18"
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          <div className="flex items-center gap-5 mb-8">
+            <div className="w-6 h-px bg-foreground/20" />
+            <p className="text-[8px] tracking-[0.55em] uppercase text-foreground/28 font-light">
+              Selected Works
+            </p>
+          </div>
+          <h2
+            className="text-5xl sm:text-6xl md:text-7xl font-light text-foreground leading-[1.05]"
+            style={{ fontFamily: "var(--font-playfair), serif" }}
+          >
             Portfolio
           </h2>
-          <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            A curated collection of visual stories that define my artistic journey
-          </p>
         </motion.div>
 
-        {/* Category Filter */}
+        {/* Category filter */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-12 sm:mb-16"
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="flex flex-wrap gap-8 mb-12 border-b border-foreground/[0.06] pb-5"
         >
           {categories.map((category) => (
-            <Button
+            <button
               key={category}
-              variant={selectedCategory === category ? "default" : "outline"}
               onClick={() => setSelectedCategory(category)}
-              className={`text-sm sm:text-base px-4 sm:px-6 py-2 ${
+              className={`text-[10px] tracking-[0.22em] uppercase pb-2 transition-all duration-300 relative ${
                 selectedCategory === category
-                  ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white"
-                  : "border-gray-300 dark:border-gray-700"
+                  ? "text-foreground"
+                  : "text-foreground/28 hover:text-foreground/55"
               }`}
             >
               {category}
-            </Button>
+              {selectedCategory === category && (
+                <motion.div
+                  layoutId="activeFilter"
+                  className="absolute -bottom-[21px] left-0 right-0 h-px bg-foreground/35"
+                />
+              )}
+            </button>
           ))}
         </motion.div>
 
-        {/* Portfolio Grid */}
-        <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          <AnimatePresence>
+        {/* Gallery grid */}
+        <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 lg:gap-x-8 gap-y-14 lg:gap-y-18">
+          <AnimatePresence mode="popLayout">
             {filteredItems.map((item, index) => (
               <motion.div
                 key={item.id}
                 layout
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4, delay: index * 0.05 }}
                 className="group cursor-pointer"
                 onClick={() => setSelectedItem(item)}
               >
-                <div className="relative overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800 aspect-[4/3]">
+                {/* Artwork image */}
+                <div className="relative overflow-hidden bg-muted aspect-[4/5] mb-4">
                   <img
                     src={item.image || "/placeholder.svg"}
                     alt={item.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.025] filter saturate-90 group-hover:saturate-100"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="absolute bottom-4 left-4 right-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 opacity-0 group-hover:opacity-100">
-                    <h3 className="text-white font-bold text-lg mb-1">{item.title}</h3>
-                    <p className="text-white/80 text-sm">{item.category}</p>
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/[0.04] transition-colors duration-500" />
+                </div>
+
+                {/* Gallery label */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-[8px] tracking-[0.4em] uppercase text-foreground/22 mb-1.5 font-light">
+                      {item.year}{item.client ? ` Â· ${item.client}` : ` Â· ${item.category}`}
+                    </p>
+                    <h3
+                      className="text-base font-light text-foreground/80 group-hover:text-foreground transition-colors duration-300 truncate"
+                      style={{ fontFamily: "var(--font-playfair), serif" }}
+                    >
+                      {item.title}
+                    </h3>
                   </div>
-                  <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="bg-white/20 backdrop-blur-sm rounded-full p-2">
-                      <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                    </div>
-                  </div>
+                  <ArrowUpRight className="w-3 h-3 text-foreground/15 group-hover:text-foreground/40 transition-colors mt-[18px] shrink-0" />
                 </div>
               </motion.div>
             ))}
           </AnimatePresence>
         </motion.div>
 
-        {/* Modal */}
+        {/* Empty state */}
+        {filteredItems.length === 0 && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-24 text-center">
+            <p
+              className="text-foreground/22 font-light italic"
+              style={{ fontFamily: "var(--font-playfair), serif" }}
+            >
+              No works curated in this category yet.
+            </p>
+          </motion.div>
+        )}
+
+        {/* Lightbox */}
         <AnimatePresence>
           {selectedItem && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
-              onClick={() => setSelectedItem(null)}
-            >
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
-                className="bg-white dark:bg-gray-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="relative">
-                  <img
-                    src={selectedItem.image || "/placeholder.svg"}
-                    alt={selectedItem.title}
-                    className="w-full h-48 sm:h-64 md:h-96 object-cover rounded-t-2xl"
-                  />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm text-white hover:bg-white/30"
-                    onClick={() => setSelectedItem(null)}
-                  >
-                    <X className="w-5 h-5" />
+            <ImageLightbox
+              src={selectedItem.image || "/placeholder.svg"}
+              alt={selectedItem.title}
+              onClose={() => setSelectedItem(null)}
+              infoPanel={
+                <div className="flex flex-col h-full justify-between">
+                  <div>
+                    {selectedItem.tags?.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-6">
+                        {selectedItem.tags.map((tag) => (
+                          <span key={tag} className="text-[9px] uppercase tracking-[0.22em] text-foreground/50 border border-border px-2 py-1">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <h3
+                      className="text-3xl sm:text-4xl font-light mb-4 text-foreground leading-tight"
+                      style={{ fontFamily: "var(--font-playfair), serif" }}
+                    >
+                      {selectedItem.title}
+                    </h3>
+                    <div className="w-8 h-px bg-foreground/15 mb-6" />
+                    <p className="text-foreground/55 mb-8 text-sm leading-relaxed font-light">
+                      {selectedItem.description}
+                    </p>
+                    <div className="flex flex-col gap-3 text-[10px] tracking-widest text-foreground/35 mb-8 uppercase border-t border-border pt-6">
+                      {selectedItem.year && (
+                        <div className="flex justify-between">
+                          <span>Year</span>
+                          <span className="text-foreground/65">{selectedItem.year}</span>
+                        </div>
+                      )}
+                      {selectedItem.client && (
+                        <div className="flex justify-between">
+                          <span>Client</span>
+                          <span className="text-foreground/65">{selectedItem.client}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between">
+                        <span>Category</span>
+                        <span className="text-foreground/65">{selectedItem.category}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <Button className="w-full bg-foreground text-background hover:bg-foreground/85 text-[10px] tracking-[0.25em] uppercase py-6 rounded-none transition-all duration-300">
+                    <ExternalLink className="w-3.5 h-3.5 mr-3" />
+                    View Exhibition
                   </Button>
                 </div>
-
-                <div className="p-4 sm:p-6">
-                  <div className="flex flex-wrap items-center gap-2 mb-4">
-                    {selectedItem.tags.map((tag) => (
-                      <Badge key={tag} variant="secondary" className="text-xs sm:text-sm">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-
-                  <h3 className="text-xl sm:text-2xl font-bold mb-2">{selectedItem.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm sm:text-base">
-                    {selectedItem.description}
-                  </p>
-
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm text-gray-500 dark:text-gray-400 mb-6 gap-2">
-                    <span>Year: {selectedItem.year}</span>
-                    <span>Client: {selectedItem.client}</span>
-                  </div>
-
-                  <Button className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-pink-500 text-white">
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    View Full Project
-                  </Button>
-                </div>
-              </motion.div>
-            </motion.div>
+              }
+            />
           )}
         </AnimatePresence>
       </div>

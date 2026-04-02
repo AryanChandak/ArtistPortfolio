@@ -1,13 +1,15 @@
-"use client"
+﻿"use client"
 
-import { useRef } from "react"
-import { motion, useInView } from "framer-motion"
-import { ExternalLink, ShoppingCart, Star, Package } from "lucide-react"
+import { useState, useRef, useEffect } from "react"
+import { motion, AnimatePresence, useInView } from "framer-motion"
+import { ShoppingBag, ArrowUpRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { createClient } from "@/utils/supabase/client"
+import { useCart } from "./cart-context"
+import ImageLightbox from "@/components/image-lightbox"
 
 interface Product {
-  id: number
+  id: string
   title: string
   description: string
   price: string
@@ -20,283 +22,193 @@ interface Product {
   externalLink: string
 }
 
-const products: Product[] = [
-  {
-    id: 1,
-    title: "Digital Dreams Collection",
-    description:
-      "A curated set of 10 high-resolution digital artworks exploring the intersection of technology and consciousness.",
-    price: "$299",
-    originalPrice: "$399",
-    image: "/placeholder.svg?height=300&width=300",
-    category: "Digital Art",
-    rating: 4.9,
-    reviews: 127,
-    featured: true,
-    externalLink: "https://etsy.com/shop/thevisual",
-  },
-  {
-    id: 2,
-    title: "Urban Pulse Photography Book",
-    description: "A 200-page coffee table book featuring the best of my street photography from around the world.",
-    price: "$89",
-    image: "/placeholder.svg?height=300&width=300",
-    category: "Photography",
-    rating: 4.8,
-    reviews: 89,
-    featured: false,
-    externalLink: "https://amazon.com/urban-pulse-photography",
-  },
-  {
-    id: 3,
-    title: "Limited Edition Prints Set",
-    description:
-      "Museum-quality prints of my most popular works, available in various sizes. Limited to 100 copies each.",
-    price: "$149",
-    originalPrice: "$199",
-    image: "/placeholder.svg?height=300&width=300",
-    category: "Prints",
-    rating: 5.0,
-    reviews: 45,
-    featured: true,
-    externalLink: "https://saatchiart.com/thevisual",
-  },
-  {
-    id: 4,
-    title: "Visual Storytelling Course",
-    description:
-      "Learn my techniques for creating compelling visual narratives. Includes 8 hours of video content and resources.",
-    price: "$199",
-    image: "/placeholder.svg?height=300&width=300",
-    category: "Education",
-    rating: 4.7,
-    reviews: 234,
-    featured: false,
-    externalLink: "https://udemy.com/visual-storytelling-masterclass",
-  },
-  {
-    id: 5,
-    title: "Nature's Symphony Calendar 2024",
-    description: "A premium wall calendar featuring 12 of my finest landscape photographs with inspirational quotes.",
-    price: "$29",
-    image: "/placeholder.svg?height=300&width=300",
-    category: "Merchandise",
-    rating: 4.6,
-    reviews: 156,
-    featured: false,
-    externalLink: "https://redbubble.com/people/thevisual",
-  },
-  {
-    id: 6,
-    title: "Custom Portrait Commission",
-    description: "Personalized digital portrait in my signature style. Perfect for gifts or personal collection.",
-    price: "$499",
-    image: "/placeholder.svg?height=300&width=300",
-    category: "Commission",
-    rating: 4.9,
-    reviews: 67,
-    featured: true,
-    externalLink: "mailto:commissions@thevisual.com",
-  },
-]
-
 const ShopSection = () => {
+  const [products, setProducts] = useState<Product[]>([])
+  const [lightboxProduct, setLightboxProduct] = useState<Product | null>(null)
+  const { addToCart } = useCart()
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
 
-  const featuredProducts = products.filter((product) => product.featured)
-  const regularProducts = products.filter((product) => !product.featured)
-
-  const renderStars = (rating: number) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <Star
-        key={i}
-        className={`w-3 h-3 sm:w-4 sm:h-4 ${
-          i < Math.floor(rating)
-            ? "text-yellow-400 fill-current"
-            : i < rating
-              ? "text-yellow-400 fill-current opacity-50"
-              : "text-gray-300"
-        }`}
-      />
-    ))
-  }
+  useEffect(() => {
+    const fetchShopItems = async () => {
+      const supabase = createClient()
+      const { data } = await supabase.from('shop_items').select('*').order('created_at', { ascending: false })
+      if (data) {
+        const formatted = data.map(item => ({
+          ...item,
+          originalPrice: item.original_price,
+          externalLink: item.external_link
+        }))
+        setProducts(formatted)
+      }
+    }
+    fetchShopItems()
+  }, [])
 
   return (
-    <section id="shop" ref={ref} className="py-16 sm:py-20 lg:py-24 bg-white dark:bg-black">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="shop" ref={ref} className="py-24 sm:py-32 lg:py-40 bg-card border-t border-foreground/[0.06]">
+      <div className="max-w-screen-2xl mx-auto px-6 sm:px-8 lg:px-16">
+
+        {/* Section header */}
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-12 sm:mb-16"
+          transition={{ duration: 0.7 }}
+          className="mb-14 sm:mb-20"
         >
-          <div className="flex justify-center mb-4">
-            <div className="flex items-center space-x-2 bg-purple-100 dark:bg-purple-900/30 rounded-full px-4 py-2">
-              <Package className="w-5 h-5 text-purple-600" />
-              <span className="text-sm font-medium text-purple-600 dark:text-purple-400">Art & Merchandise</span>
-            </div>
+          <div className="flex items-center gap-5 mb-8">
+            <div className="w-6 h-px bg-foreground/20" />
+            <p className="text-[8px] tracking-[0.55em] uppercase text-foreground/28 font-light">
+              Available Editions
+            </p>
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          <h2
+            className="text-5xl sm:text-6xl md:text-7xl font-light text-foreground leading-tight"
+            style={{ fontFamily: "var(--font-playfair), serif" }}
+          >
             Shop
           </h2>
-          <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            Take home a piece of my artistic journey with prints, books, and exclusive collections
-          </p>
         </motion.div>
 
-        {/* Featured Products */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="mb-12 sm:mb-16"
-        >
-          <h3 className="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 text-center">Featured Items</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {featuredProducts.map((product, index) => (
+        {/* Products grid */}
+        {products.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 lg:gap-x-8 gap-y-12">
+            {products.map((product, index) => (
               <motion.div
                 key={product.id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
-                className="group relative bg-gray-50 dark:bg-gray-900 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.07 }}
+                className="group cursor-pointer"
+                onClick={() => setLightboxProduct(product)}
               >
-                <Badge className="absolute top-4 left-4 z-10 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs">
-                  Featured
-                </Badge>
-
-                <div className="relative overflow-hidden">
+                <div className="relative overflow-hidden bg-muted aspect-[4/5] mb-4">
                   <img
                     src={product.image || "/placeholder.svg"}
                     alt={product.title}
-                    className="w-full h-48 sm:h-64 object-cover transition-transform duration-500 group-hover:scale-110"
+                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03] filter saturate-90 group-hover:saturate-100"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </div>
-
-                <div className="p-4 sm:p-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <Badge variant="outline" className="text-xs">
-                      {product.category}
-                    </Badge>
-                    <div className="flex items-center space-x-1">
-                      {renderStars(product.rating)}
-                      <span className="text-xs sm:text-sm text-gray-500 ml-1">({product.reviews})</span>
+                  {product.featured && (
+                    <div className="absolute top-3 left-3 text-[7px] tracking-[0.3em] uppercase bg-foreground text-background px-2.5 py-1.5">
+                      Edition
                     </div>
-                  </div>
-
-                  <h3 className="text-lg sm:text-xl font-bold mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
-                    {product.title}
-                  </h3>
-
-                  <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm sm:text-base line-clamp-2">
-                    {product.description}
-                  </p>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-xl sm:text-2xl font-bold text-purple-600">{product.price}</span>
+                  )}
+                </div>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-[8px] tracking-[0.3em] uppercase text-foreground/25 mb-1">
+                      {product.category}
+                    </p>
+                    <h3
+                      className="text-base font-light text-foreground truncate group-hover:text-foreground/60 transition-colors duration-300"
+                      style={{ fontFamily: "var(--font-playfair), serif" }}
+                    >
+                      {product.title}
+                    </h3>
+                    <div className="flex items-baseline gap-2 mt-1.5">
+                      <span className="text-sm font-light text-foreground/70">{product.price}</span>
                       {product.originalPrice && (
-                        <span className="text-sm sm:text-lg text-gray-500 line-through">{product.originalPrice}</span>
+                        <span className="text-xs text-foreground/20 line-through">{product.originalPrice}</span>
                       )}
                     </div>
-                    <Button
-                      asChild
-                      size="sm"
-                      className="bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600"
-                    >
-                      <a href={product.externalLink} target="_blank" rel="noopener noreferrer">
-                        <ShoppingCart className="w-4 h-4 mr-2" />
-                        Buy Now
-                      </a>
-                    </Button>
                   </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      addToCart({ id: product.id, title: product.title, price: product.price, image: product.image, category: product.category, quantity: 1 })
+                    }}
+                    className="text-foreground/20 hover:text-foreground transition-colors mt-3 shrink-0"
+                    aria-label="Add to cart"
+                  >
+                    <ShoppingBag className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </motion.div>
             ))}
           </div>
+        ) : (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-20 text-center">
+            <p className="text-foreground/25 font-light italic" style={{ fontFamily: "var(--font-playfair), serif" }}>
+              No editions available at this time.
+            </p>
+          </motion.div>
+        )}
+
+        {/* Commission CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, delay: 0.2 }}
+          className="mt-24 sm:mt-32 border-t border-foreground/[0.06] pt-16 grid sm:grid-cols-2 items-center gap-8"
+        >
+          <div>
+            <p className="text-[8px] tracking-[0.5em] uppercase text-foreground/25 mb-3 font-light">Bespoke Work</p>
+            <h3
+              className="text-3xl sm:text-4xl font-light text-foreground leading-tight"
+              style={{ fontFamily: "var(--font-playfair), serif" }}
+            >
+              Commission a<br />
+              <em className="italic">Piece</em>
+            </h3>
+          </div>
+          <div>
+            <p className="text-foreground/45 font-light leading-[1.8] text-sm mb-6">
+              Personalized commissions and custom artwork crafted to your vision. Each piece is a unique collaboration shaped by your story.
+            </p>
+            <button
+              onClick={() => { const el = document.querySelector('#contact'); if (el) el.scrollIntoView({ behavior: 'smooth' }) }}
+              className="inline-flex items-center gap-2 text-[9px] tracking-[0.3em] uppercase text-foreground/40 hover:text-foreground border border-foreground/15 hover:border-foreground/35 px-6 py-3.5 transition-all duration-300"
+            >
+              Begin a conversation
+              <ArrowUpRight className="w-3 h-3" />
+            </button>
+          </div>
         </motion.div>
 
-        {/* Regular Products */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.6 }}
-        >
-          <h3 className="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 text-center">More Products</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {regularProducts.map((product, index) => (
-              <motion.div
-                key={product.id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
-                className="group bg-gray-50 dark:bg-gray-900 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-              >
-                <div className="relative overflow-hidden">
-                  <img
-                    src={product.image || "/placeholder.svg"}
-                    alt={product.title}
-                    className="w-full h-40 sm:h-48 object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                </div>
-
-                <div className="p-4 sm:p-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <Badge variant="outline" className="text-xs">
-                      {product.category}
-                    </Badge>
-                    <div className="flex items-center space-x-1">
-                      {renderStars(product.rating)}
-                      <span className="text-xs sm:text-sm text-gray-500 ml-1">({product.reviews})</span>
+        {/* Lightbox */}
+        <AnimatePresence>
+          {lightboxProduct && (
+            <ImageLightbox
+              src={lightboxProduct.image || "/placeholder.svg"}
+              alt={lightboxProduct.title}
+              onClose={() => setLightboxProduct(null)}
+              infoPanel={
+                <div className="flex flex-col h-full justify-between">
+                  <div>
+                    <span className="text-[9px] tracking-[0.2em] uppercase text-foreground/35 border border-border px-2.5 py-1">
+                      {lightboxProduct.category}
+                    </span>
+                    <h2 className="text-3xl mt-5 mb-3 text-foreground font-light leading-tight"
+                        style={{ fontFamily: "var(--font-playfair), serif" }}>
+                      {lightboxProduct.title}
+                    </h2>
+                    <div className="w-8 h-px bg-foreground/15 mb-5" />
+                    <p className="text-foreground/45 text-sm font-light leading-relaxed mb-8">
+                      {lightboxProduct.description}
+                    </p>
+                    <div className="flex items-baseline gap-3">
+                      <span className="text-2xl font-light text-foreground">{lightboxProduct.price}</span>
+                      {lightboxProduct.originalPrice && (
+                        <span className="text-sm text-foreground/25 line-through">{lightboxProduct.originalPrice}</span>
+                      )}
                     </div>
                   </div>
-
-                  <h3 className="text-base sm:text-lg font-bold mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
-                    {product.title}
-                  </h3>
-
-                  <p className="text-gray-600 dark:text-gray-400 mb-4 text-xs sm:text-sm line-clamp-2">
-                    {product.description}
-                  </p>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-lg sm:text-xl font-bold text-purple-600">{product.price}</span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      asChild
-                      className="border-purple-300 dark:border-purple-700 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 bg-transparent"
-                    >
-                      <a href={product.externalLink} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="w-4 h-4 mr-2" />
-                        View
-                      </a>
-                    </Button>
-                  </div>
+                  <Button
+                    className="w-full bg-foreground text-background hover:bg-foreground/88 text-[9px] tracking-[0.25em] uppercase py-6 rounded-none mt-8"
+                    onClick={() => {
+                      addToCart({ id: lightboxProduct.id, title: lightboxProduct.title, price: lightboxProduct.price, image: lightboxProduct.image, category: lightboxProduct.category, quantity: 1 })
+                      setLightboxProduct(null)
+                    }}
+                  >
+                    Add to Cart
+                  </Button>
                 </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Call to Action */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 1.2 }}
-          className="text-center mt-12 sm:mt-16 p-6 sm:p-8 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-2xl border border-purple-200 dark:border-purple-800"
-        >
-          <h3 className="text-xl sm:text-2xl font-bold mb-4">Looking for Something Custom?</h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-2xl mx-auto text-sm sm:text-base">
-            I offer personalized commissions and custom artwork tailored to your vision. Let's collaborate to create
-            something unique just for you.
-          </p>
-          <Button size="lg" className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 sm:px-8 py-3">
-            Request Custom Work
-          </Button>
-        </motion.div>
+              }
+            />
+          )}
+        </AnimatePresence>
       </div>
     </section>
   )

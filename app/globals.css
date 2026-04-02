@@ -4,58 +4,61 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    /* Gallery White — pure walls, sharp contrast */
+    --background: 36 10% 97%;      /* #F8F6F3 — warm gallery white */
+    --foreground: 0 0% 8%;         /* #141414 — near black */
+    --card: 0 0% 100%;             /* pure white for cards/mats */
+    --card-foreground: 0 0% 8%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-    --radius: 0.5rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --popover-foreground: 0 0% 8%;
+    --primary: 0 0% 8%;            /* dark for buttons/CTAs on white */
+    --primary-foreground: 36 10% 97%;
+    --secondary: 36 8% 93%;
+    --secondary-foreground: 0 0% 12%;
+    --muted: 36 8% 92%;
+    --muted-foreground: 0 0% 42%;
+    --accent: 35 18% 60%;          /* warm grey accent */
+    --accent-foreground: 0 0% 8%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 36 8% 86%;
+    --input: 36 8% 86%;
+    --ring: 0 0% 8%;
+    --radius: 0rem;                /* Gallery uses sharp corners */
+    --chart-1: 35 18% 60%;
+    --chart-2: 160 50% 40%;
+    --chart-3: 25 80% 55%;
+    --chart-4: 200 60% 50%;
+    --chart-5: 340 65% 55%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    /* Gallery Dark — warm charcoal walls, off-white text, gold accents */
+    --background: 30 8% 5%;        /* #0D0B09 — deep warm black */
+    --foreground: 36 18% 87%;      /* #E2D9CC — warm off-white */
+    --card: 30 8% 7%;              /* slightly lighter card */
+    --card-foreground: 36 18% 87%;
+    --popover: 30 8% 7%;
+    --popover-foreground: 36 18% 87%;
+    --primary: 36 28% 62%;         /* #C5B08A — warm gold accent */
+    --primary-foreground: 30 8% 5%;
+    --secondary: 30 6% 11%;
+    --secondary-foreground: 36 18% 78%;
+    --muted: 30 6% 11%;
+    --muted-foreground: 30 5% 46%;
+    --accent: 36 28% 62%;
+    --accent-foreground: 30 8% 5%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 36 18% 87%;
+    --border: 30 6% 13%;
+    --input: 30 6% 13%;
+    --ring: 36 28% 62%;
+    --radius: 0rem;
+    --chart-1: 36 28% 62%;
+    --chart-2: 160 55% 45%;
+    --chart-3: 25 80% 55%;
+    --chart-4: 200 65% 55%;
+    --chart-5: 340 70% 55%;
   }
 }
 
@@ -65,39 +68,46 @@
   }
   body {
     @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-gray-100 dark:bg-gray-800;
-}
-
+/* Custom scrollbar — thin gallery style */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  @apply bg-purple-500 rounded-full;
+  background: hsl(var(--border));
+  border-radius: 0;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-purple-600;
+  background: hsl(var(--muted-foreground) / 0.4);
 }
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
+html { scroll-behavior: smooth; }
+
+/* Gallery mat — white border frame presentation */
+.gallery-mat {
+  padding: 10px;
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border) / 0.6);
+  box-shadow: 0 4px 28px -4px hsl(0 0% 0% / 0.07);
 }
 
-/* Line clamp utility */
+/* Gallery rule — thin section dividers */
+.gallery-rule {
+  height: 1px;
+  background: hsl(var(--foreground) / 0.06);
+  width: 100%;
+}
+
+/* Line clamp */
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-
 .line-clamp-3 {
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -105,34 +115,110 @@ html {
   overflow: hidden;
 }
 
-/* Custom animations */
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
+/* ===== PREMIUM EFFECTS ===== */
+
+/* Infinite Marquee / Carousel */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.marquee-track {
+  display: flex;
+  animation: marquee 30s linear infinite;
+  width: max-content;
+}
+.marquee-track:hover {
+  animation-play-state: paused;
 }
 
+/* Gold gradient text */
+.text-gradient-gold {
+  background: linear-gradient(135deg, #C8A04A, #E8C86A, #D4A853, #B8903A);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Warm glow on hover */
+.glow-gold {
+  transition: box-shadow 0.5s ease;
+}
+.glow-gold:hover {
+  box-shadow: 0 10px 40px -10px rgba(200, 160, 74, 0.25);
+}
+
+/* Elegant text reveal */
+@keyframes text-slide-up {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.text-slide-up {
+  overflow: hidden;
+}
+.text-slide-up > * {
+  animation: text-slide-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Menu link hover underline */
+.nav-link-hover {
+  position: relative;
+}
+.nav-link-hover::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: hsl(38 70% 50%);
+  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.nav-link-hover:hover::after {
+  width: 100%;
+}
+
+/* Glass card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Float animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
 .animate-float {
   animation: float 6s ease-in-out infinite;
 }
 
-/* Gradient text animation */
-@keyframes gradient {
-  0%,
-  100% {
-    background-size: 200% 200%;
-    background-position: left center;
-  }
-  50% {
-    background-size: 200% 200%;
-    background-position: right center;
-  }
+/* Gradient animation */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease infinite;
 }
 
-.animate-gradient {
-  animation: gradient 3s ease infinite;
+/* Shimmer */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+.shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(200,160,74,0.06) 50%, transparent 100%);
+  animation: shimmer 4s infinite;
+  pointer-events: none;
+}
+
+/* Smooth section reveal */
+section {
+  transition: opacity 0.6s ease;
 }

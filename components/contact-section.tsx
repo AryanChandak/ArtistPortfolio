@@ -1,14 +1,14 @@
-"use client"
+﻿"use client"
 
 import type React from "react"
 
 import { useState, useRef } from "react"
 import { motion, useInView } from "framer-motion"
-import { Mail, Phone, MapPin, Send, CheckCircle, Instagram } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Mail, Phone, MapPin, Send, CheckCircle, Instagram, ArrowUpRight } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
+import { createClient } from "@/utils/supabase/client"
 
 const ContactSection = () => {
   const [formData, setFormData] = useState({
@@ -32,220 +32,187 @@ const ContactSection = () => {
     e.preventDefault()
     setIsSubmitting(true)
 
-    // Simulate form submission (replace with actual Formspree or Google Forms integration)
-    setTimeout(() => {
-      setIsSubmitting(false)
+    const supabase = createClient()
+    const { error } = await supabase.from('messages').insert({
+      name: formData.name,
+      email: formData.email,
+      subject: formData.subject,
+      message: formData.message
+    })
+
+    setIsSubmitting(false)
+    if (!error) {
       setIsSubmitted(true)
       setFormData({ name: "", email: "", subject: "", message: "" })
-
-      // Reset success message after 5 seconds
       setTimeout(() => setIsSubmitted(false), 5000)
-    }, 2000)
+    }
   }
 
   const contactInfo = [
     {
-      icon: <Mail className="w-6 h-6" />,
+      icon: <Mail className="w-4 h-4" />,
       title: "Email",
       content: "thevisual.art1@gmail.com",
       link: "mailto:thevisual.art1@gmail.com",
     },
     {
-      icon: <Instagram className="w-6 h-6" />,
+      icon: <Instagram className="w-4 h-4" />,
       title: "Instagram",
       content: "@thevisual.art1",
       link: "https://instagram.com/thevisual.art1",
     },
     {
-      icon: <Phone className="w-6 h-6" />,
+      icon: <Phone className="w-4 h-4" />,
       title: "Phone",
-      content: "+1 (555) 123-4567",
-      link: "tel:+15551234567",
+      content: "+91 8105237600",
+      link: "tel:+918105237600",
     },
     {
-      icon: <MapPin className="w-6 h-6" />,
+      icon: <MapPin className="w-4 h-4" />,
       title: "Location",
-      content: "New York, NY",
+      content: "Bangalore, India",
       link: "#",
     },
   ]
 
   return (
-    <section id="contact" ref={ref} className="py-20 bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="contact" ref={ref} className="py-24 sm:py-32 lg:py-40 bg-card border-t border-foreground/[0.06]">
+      <div className="max-w-screen-2xl mx-auto px-6 sm:px-8 lg:px-16">
+
+        {/* Section header */}
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-12"
+          transition={{ duration: 0.7 }}
+          className="mb-14 sm:mb-20"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            Let's Create Together
+          <div className="flex items-center gap-5 mb-8">
+            <div className="w-6 h-px bg-foreground/20" />
+            <p className="text-[8px] tracking-[0.55em] uppercase text-foreground/28 font-light">
+              Get in Touch
+            </p>
+          </div>
+          <h2
+            className="text-5xl sm:text-6xl md:text-7xl font-light text-foreground leading-tight"
+            style={{ fontFamily: "var(--font-playfair), serif" }}
+          >
+            Contact
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            Have a project in mind? I'd love to hear about it and explore how we can bring your vision to life.
-          </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Contact Information */}
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="space-y-8"
-          >
-            <div>
-              <h3 className="text-2xl font-bold mb-6">Get in Touch</h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-8">
-                Whether you're looking for a creative collaboration, have questions about my work, or just want to say
-                hello, I'm always excited to connect with fellow creatives and art enthusiasts.
-              </p>
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
 
-            <div className="space-y-6">
+          {/* Left â€” contact info */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.1 }}
+          >
+            <p className="text-foreground/65 font-light leading-[1.9] text-sm mb-12 max-w-sm">
+              Open to creative collaborations, commissions, and conversations. Reach out and let&apos;s explore what we can create together.
+            </p>
+
+            <div className="space-y-0">
               {contactInfo.map((info, index) => (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
-                  className="flex items-center space-x-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                  initial={{ opacity: 0 }}
+                  animate={isInView ? { opacity: 1 } : {}}
+                  transition={{ duration: 0.5, delay: 0.2 + index * 0.07 }}
+                  className="flex items-center gap-6 py-5 border-b border-foreground/[0.06] group"
                 >
-                  <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center text-white">
-                    {info.icon}
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 dark:text-white">{info.title}</h4>
-                    <a
-                      href={info.link}
-                      className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
-                    >
-                      {info.content}
-                    </a>
-                  </div>
+                  <span className="text-[9px] tracking-[0.35em] uppercase text-foreground/50 w-20 shrink-0">{info.title}</span>
+                  <a
+                    href={info.link}
+                    className="text-foreground/80 hover:text-foreground transition-colors font-light text-sm"
+                    target={info.link.startsWith("http") ? "_blank" : undefined}
+                    rel={info.link.startsWith("http") ? "noopener noreferrer" : undefined}
+                  >
+                    {info.content}
+                  </a>
                 </motion.div>
               ))}
             </div>
-
-            {/* Social Links */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: 0.7 }}
-              className="pt-8 border-t border-gray-200 dark:border-gray-700"
-            >
-              <h4 className="font-semibold text-gray-900 dark:text-white mb-4">Follow My Journey</h4>
-              <div className="flex space-x-4">
-                <a
-                  href="https://instagram.com/thevisual.art1"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg text-white hover:shadow-lg transition-all duration-300 transform hover:scale-105"
-                >
-                  <Instagram className="w-6 h-6" />
-                </a>
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                Get daily inspiration and behind-the-scenes content
-              </p>
-            </motion.div>
           </motion.div>
 
-          {/* Contact Form */}
+          {/* Right â€” contact form */}
           <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl"
+            initial={{ opacity: 0, y: 16 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.25 }}
           >
             {isSubmitted ? (
               <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-center py-12"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="py-16"
               >
-                <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                <h3 className="text-2xl font-bold text-green-600 mb-2">Message Sent!</h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Thank you for reaching out. I'll get back to you within 24 hours.
+                <CheckCircle className="w-8 h-8 text-foreground/40 mb-5" />
+                <h3
+                  className="text-2xl font-light text-foreground mb-2"
+                  style={{ fontFamily: "var(--font-playfair), serif" }}
+                >
+                  Message Sent
+                </h3>
+                <p className="text-foreground/40 font-light text-sm">
+                  Thank you â€” I&apos;ll get back to you within 24 hours.
                 </p>
               </motion.div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <form onSubmit={handleSubmit} className="space-y-7">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-7">
                   <div>
-                    <Label htmlFor="name">Name *</Label>
+                    <Label htmlFor="name" className="text-[9px] tracking-[0.35em] uppercase text-foreground/55 mb-2.5 block">Name</Label>
                     <Input
-                      id="name"
-                      name="name"
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      className="mt-1"
-                      placeholder="Your full name"
+                      id="name" name="name" type="text" required
+                      value={formData.name} onChange={handleInputChange}
+                      placeholder="Your name"
+                      className="bg-transparent border-0 border-b border-foreground/25 text-foreground placeholder:text-foreground/35 focus:border-foreground/55 rounded-none text-sm px-0 h-10 focus-visible:ring-0 focus-visible:ring-offset-0"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="email">Email *</Label>
+                    <Label htmlFor="email" className="text-[9px] tracking-[0.35em] uppercase text-foreground/55 mb-2.5 block">Email</Label>
                     <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="mt-1"
-                      placeholder="your.email@example.com"
+                      id="email" name="email" type="email" required
+                      value={formData.email} onChange={handleInputChange}
+                      placeholder="your@email.com"
+                      className="bg-transparent border-0 border-b border-foreground/25 text-foreground placeholder:text-foreground/35 focus:border-foreground/55 rounded-none text-sm px-0 h-10 focus-visible:ring-0 focus-visible:ring-offset-0"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="subject">Subject *</Label>
+                  <Label htmlFor="subject" className="text-[9px] tracking-[0.35em] uppercase text-foreground/55 mb-2.5 block">Subject</Label>
                   <Input
-                    id="subject"
-                    name="subject"
-                    type="text"
-                    required
-                    value={formData.subject}
-                    onChange={handleInputChange}
-                    className="mt-1"
+                    id="subject" name="subject" type="text" required
+                    value={formData.subject} onChange={handleInputChange}
                     placeholder="What's this about?"
+                    className="bg-transparent border-0 border-b border-foreground/25 text-foreground placeholder:text-foreground/35 focus:border-foreground/55 rounded-none text-sm px-0 h-10 focus-visible:ring-0 focus-visible:ring-offset-0"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="message">Message *</Label>
+                  <Label htmlFor="message" className="text-[9px] tracking-[0.35em] uppercase text-foreground/55 mb-2.5 block">Message</Label>
                   <Textarea
-                    id="message"
-                    name="message"
-                    required
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    className="mt-1 min-h-[120px]"
-                    placeholder="Tell me about your project or inquiry..."
+                    id="message" name="message" required
+                    value={formData.message} onChange={handleInputChange}
+                    placeholder="Tell me about your project..."
+                    className="bg-transparent border-0 border-b border-foreground/25 text-foreground placeholder:text-foreground/35 focus:border-foreground/55 rounded-none text-sm px-0 min-h-[120px] resize-none focus-visible:ring-0 focus-visible:ring-offset-0"
                   />
                 </div>
 
-                <Button
+                <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 text-lg font-semibold disabled:opacity-50"
+                  className="flex items-center gap-3 text-[9px] tracking-[0.3em] uppercase bg-foreground text-background hover:bg-foreground/88 disabled:opacity-40 px-8 py-4 transition-all duration-300"
                 >
                   {isSubmitting ? (
-                    <div className="flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
-                      Sending...
-                    </div>
+                    <div className="w-3.5 h-3.5 border border-background/40 border-t-background rounded-full animate-spin" />
                   ) : (
-                    <div className="flex items-center justify-center">
-                      <Send className="w-5 h-5 mr-2" />
-                      Send Message
-                    </div>
+                    <Send className="w-3 h-3" />
                   )}
-                </Button>
+                  {isSubmitting ? "Sending..." : "Send Message"}
+                </button>
               </form>
             )}
           </motion.div>
